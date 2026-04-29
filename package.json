@@ -1,6 +1,6 @@
 {
   "name": "@izgateway/uuid-cjs",
-  "version": "14.0.1",
+  "version": "14.0.2",
   "description": "CJS-compatible replacement for uuid@14, backed by Node built-in crypto. For use in NextJS applications where next-auth v4 requires CommonJS uuid.",
   "main": "src/index.js",
   "types": "src/index.d.ts",
