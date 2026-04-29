@@ -45,31 +45,37 @@ export interface V1Options {
  * Generate a time-based (version 1) UUID.
  * Uses a random node ID (multicast bit set) and monotonic clock sequence.
  */
-export declare function v1(options?: V1Options, buf?: Uint8Array, offset?: number): string | Uint8Array;
+export declare function v1(options?: V1Options): string;
+export declare function v1(options: V1Options | undefined, buf: Uint8Array, offset?: number): Uint8Array;
 
 /**
  * Generate a name-based (MD5, version 3) UUID.
  */
-export declare function v3(name: string | Uint8Array, namespace: string | Uint8Array, buf?: Uint8Array, offset?: number): string | Uint8Array;
+export declare function v3(name: string | Uint8Array, namespace: string | Uint8Array): string;
+export declare function v3(name: string | Uint8Array, namespace: string | Uint8Array, buf: Uint8Array, offset?: number): Uint8Array;
 
 /**
  * Generate a random (version 4) UUID.
  */
-export declare function v4(options?: Record<string, unknown>, buf?: Uint8Array, offset?: number): string | Uint8Array;
+export declare function v4(options?: Record<string, unknown>): string;
+export declare function v4(options: Record<string, unknown> | undefined, buf: Uint8Array, offset?: number): Uint8Array;
 
 /**
  * Generate a name-based (SHA-1, version 5) UUID.
  */
-export declare function v5(name: string | Uint8Array, namespace: string | Uint8Array, buf?: Uint8Array, offset?: number): string | Uint8Array;
+export declare function v5(name: string | Uint8Array, namespace: string | Uint8Array): string;
+export declare function v5(name: string | Uint8Array, namespace: string | Uint8Array, buf: Uint8Array, offset?: number): Uint8Array;
 
 /**
  * Generate a reordered time-based (version 6) UUID.
  * Lexicographic sort order equals chronological order.
  */
-export declare function v6(options?: V1Options, buf?: Uint8Array, offset?: number): string | Uint8Array;
+export declare function v6(options?: V1Options): string;
+export declare function v6(options: V1Options | undefined, buf: Uint8Array, offset?: number): Uint8Array;
 
 /**
  * Generate a Unix timestamp + random (version 7) UUID.
  * Lexicographic sort order equals chronological order.
  */
-export declare function v7(options?: Record<string, unknown>, buf?: Uint8Array, offset?: number): string | Uint8Array;
+export declare function v7(options?: Record<string, unknown>): string;
+export declare function v7(options: Record<string, unknown> | undefined, buf: Uint8Array, offset?: number): Uint8Array;
