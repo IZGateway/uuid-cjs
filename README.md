@@ -1,5 +1,6 @@
 # @izgateway/uuid-cjs
 
+
 A CommonJS (CJS) compatible full replacement for [uuid](https://github.com/uuidjs/uuid) v14+,
 for applications that cannot yet consume the ESM-only uuid package directly.
 
