@@ -103,3 +103,22 @@ jobs:
           git tag -f "v${MAJOR}"
           git push origin "v${VERSION}" --force
           git push origin "v${MAJOR}" --force
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION=${{ steps.ver.outputs.version }}
+          PREV_TAG=$(git tag --sort=-version:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sed -n '2p')
+          if [ -n "$PREV_TAG" ]; then
+            HISTORY=$(git log "${PREV_TAG}..HEAD" --oneline --no-decorate)
+          else
+            HISTORY=$(git log --oneline --no-decorate)
+          fi
+          BODY="This is Release ${VERSION} of @izgateway/uuid-cjs
+
+## Commits
+${HISTORY}"
+          gh release create "v${VERSION}" \
+            --title "Release ${VERSION}" \
+            --notes "${BODY}"
