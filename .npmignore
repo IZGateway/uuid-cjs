@@ -1,0 +1,6 @@
+# Only publish the runtime files
+.github/
+openspec/
+src/test/
+.project
+.gitignore
