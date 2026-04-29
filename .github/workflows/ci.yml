@@ -115,10 +115,7 @@ jobs:
           else
             HISTORY=$(git log --oneline --no-decorate)
           fi
-          BODY="This is Release ${VERSION} of @izgateway/uuid-cjs
-
-## Commits
-${HISTORY}"
+          NOTES="This is Release ${VERSION} of @izgateway/uuid-cjs\n\n## Commits\n${HISTORY}"
           gh release create "v${VERSION}" \
             --title "Release ${VERSION}" \
-            --notes "${BODY}"
+            --notes "$(printf '%b' "${NOTES}")"
