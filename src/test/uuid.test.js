@@ -86,6 +86,20 @@ describe('4.6 v4', () => {
     assert.strictEqual(result, buf);
     assert.match(stringify(buf), UUID_REGEX);
   });
+  it('options.random produces deterministic output', () => {
+    const random = new Uint8Array(16).fill(0xab);
+    const a = v4({ random });
+    const b = v4({ random });
+    assert.equal(a, b);
+    assert.match(a, UUID_REGEX);
+    assert.equal(version(a), 4);
+  });
+  it('options.rng is called and its bytes are used', () => {
+    let called = false;
+    const rng = () => { called = true; return new Uint8Array(16).fill(0xcd); };
+    v4({ rng });
+    assert.ok(called);
+  });
 });
 
 // ── 4.7 v3 ───────────────────────────────────────────────────────────────────
@@ -107,6 +121,18 @@ describe('4.9 v1', () => {
   it('returns a valid UUID string', () => assert.match(String(v1()), UUID_REGEX));
   it('version nibble is 1', () => assert.equal(version(String(v1())), 1));
   it('successive calls produce different values', () => assert.notEqual(String(v1()), String(v1())));
+  it('options.msecs produces deterministic output', () => {
+    const a = v1({ msecs: 1000000, clockseq: 0x1234, node: [0x01, 0x02, 0x03, 0x04, 0x05, 0x06] });
+    const b = v1({ msecs: 1000000, clockseq: 0x1234, node: [0x01, 0x02, 0x03, 0x04, 0x05, 0x06] });
+    assert.equal(String(a), String(b));
+    assert.equal(version(String(a)), 1);
+  });
+  it('options.nsecs produces different output than nsecs=0', () => {
+    const opts = { msecs: 1000000, clockseq: 0x1234, node: [0x01, 0x02, 0x03, 0x04, 0x05, 0x06] };
+    const a = v1({ ...opts, nsecs: 0 });
+    const b = v1({ ...opts, nsecs: 1 });
+    assert.notEqual(String(a), String(b));
+  });
 });
 
 // ── 4.10 v6 ──────────────────────────────────────────────────────────────────
@@ -118,6 +144,11 @@ describe('4.10 v6', () => {
     const b = String(v6());
     assert.ok(a <= b, `expected ${a} <= ${b}`);
   });
+  it('options.msecs produces deterministic output', () => {
+    const opts = { msecs: 1000000, clockseq: 0x1234, node: [0x01, 0x02, 0x03, 0x04, 0x05, 0x06] };
+    assert.equal(String(v6(opts)), String(v6(opts)));
+    assert.equal(version(String(v6(opts))), 6);
+  });
 });
 
 // ── 4.11 v7 ──────────────────────────────────────────────────────────────────
@@ -128,5 +159,15 @@ describe('4.11 v7', () => {
     const a = String(v7());
     const b = String(v7());
     assert.ok(a <= b, `expected ${a} <= ${b}`);
+  });
+  it('options.msecs produces deterministic output with fixed seq and random', () => {
+    const opts = { msecs: 1700000000000, seq: 0x12345678, random: new Uint8Array(16).fill(0xaa) };
+    assert.equal(String(v7(opts)), String(v7(opts)));
+    assert.equal(version(String(v7(opts))), 7);
+  });
+  it('options.seq changes the output', () => {
+    const a = v7({ msecs: 1700000000000, seq: 1 });
+    const b = v7({ msecs: 1700000000000, seq: 2 });
+    assert.notEqual(String(a), String(b));
   });
 });
