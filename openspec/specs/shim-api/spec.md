@@ -1,4 +1,6 @@
-# Spec: Shim API
+## Purpose
+
+CJS-compatible shim for uuid@14 — zero dependencies, backed by Node.js built-in `crypto`.
 
 ## Requirements
 

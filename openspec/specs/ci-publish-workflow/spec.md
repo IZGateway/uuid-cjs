@@ -1,4 +1,6 @@
-# Spec: CI Publish Workflow
+## Purpose
+
+GitHub Actions CI/CD workflow for dev publish on PR open/sync and release publish on PR merge.
 
 ## Requirements
 

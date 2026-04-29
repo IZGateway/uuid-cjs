@@ -1,4 +1,6 @@
-# Spec: Secret Safety
+## Purpose
+
+Ensures no auth tokens or secrets are committed to the repository or published in the npm package.
 
 ## Requirements
 
