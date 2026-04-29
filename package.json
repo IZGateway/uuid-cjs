@@ -1,0 +1,29 @@
+{
+  "name": "@izgateway/uuid-cjs",
+  "version": "14.0.0",
+  "description": "CJS-compatible replacement for uuid@14, backed by Node built-in crypto. For use in NextJS applications where next-auth v4 requires CommonJS uuid.",
+  "main": "src/index.js",
+  "types": "src/index.d.ts",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "node --test src/test/*.test.js"
+  },
+  "dependencies": {},
+  "devDependencies": {},
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/IZGateway/uuid-cjs.git"
+  },
+  "license": "MIT",
+  "keywords": [
+    "uuid",
+    "cjs",
+    "commonjs",
+    "izgateway"
+  ]
+}

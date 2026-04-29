@@ -1,0 +1,103 @@
+name: CI
+
+on:
+  pull_request:
+    types: [opened, synchronize, labeled, closed]
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  dev-publish:
+    if: github.event_name == 'workflow_dispatch' || github.event.action != 'closed'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          registry-url: 'https://npm.pkg.github.com/'
+          scope: '@izgateway'
+
+      - name: Run tests
+        run: node --test src/test/*.test.js
+
+      - name: Compute bump type
+        id: bump
+        run: |
+          LABELS='${{ toJson(github.event.pull_request.labels.*.name) }}'
+          if echo "$LABELS" | grep -q 'bump:major'; then
+            echo "type=major" >> "$GITHUB_OUTPUT"
+          elif echo "$LABELS" | grep -q 'bump:minor'; then
+            echo "type=minor" >> "$GITHUB_OUTPUT"
+          else
+            echo "type=patch" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Publish dev build
+        run: |
+          BUMP=${{ steps.bump.outputs.type }}
+          npm version $BUMP --no-git-tag-version
+          NEXT=$(node -p "require('./package.json').version")
+          npm version "${NEXT}-dev.${{ github.run_number }}" --no-git-tag-version --allow-same-version
+          npm publish --tag dev
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  release:
+    if: github.event.action == 'closed' && github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          registry-url: 'https://npm.pkg.github.com/'
+          scope: '@izgateway'
+
+      - name: Run tests
+        run: node --test src/test/*.test.js
+
+      - name: Compute bump type
+        id: bump
+        run: |
+          LABELS='${{ toJson(github.event.pull_request.labels.*.name) }}'
+          if echo "$LABELS" | grep -q 'bump:major'; then
+            echo "type=major" >> "$GITHUB_OUTPUT"
+          elif echo "$LABELS" | grep -q 'bump:minor'; then
+            echo "type=minor" >> "$GITHUB_OUTPUT"
+          else
+            echo "type=patch" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Bump version and commit
+        id: ver
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          npm version ${{ steps.bump.outputs.type }} -m "chore: release v%s [skip ci]"
+          echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
+          git push
+
+      - name: Publish release
+        run: npm publish --tag latest
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create Git tags
+        run: |
+          VERSION=${{ steps.ver.outputs.version }}
+          MAJOR=$(echo "$VERSION" | cut -d. -f1)
+          git tag "v${VERSION}"
+          git tag -f "v${MAJOR}"
+          git push origin "v${VERSION}"
+          git push origin "v${MAJOR}" --force
