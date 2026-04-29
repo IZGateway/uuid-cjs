@@ -40,9 +40,8 @@ jobs:
       - name: Publish dev build
         run: |
           BUMP=${{ steps.bump.outputs.type }}
-          npm version $BUMP --no-git-tag-version
-          NEXT=$(node -p "require('./package.json').version")
-          npm version "${NEXT}-dev.${{ github.run_number }}" --no-git-tag-version --allow-same-version
+          NEXT=$(npm version $BUMP --no-git-tag-version | sed 's/^v//')
+          node -e "const fs=require('fs'),p=JSON.parse(fs.readFileSync('package.json','utf8'));p.version='${NEXT}-dev.${{ github.run_number }}';fs.writeFileSync('package.json',JSON.stringify(p,null,2)+'\n')"
           npm publish --tag dev
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
